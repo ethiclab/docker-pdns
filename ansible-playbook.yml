@@ -126,19 +126,25 @@
         name: pdns
         image: pschiffe/pdns-mysql:{{ "alpine" if alpine | bool else "latest" }}
         state: '{{ c_state }}'
-        hostname: ns1.example.com
+        hostname: enneesseuno.ethiclab.it
         networks_cli_compatible: true
         networks:
           - name: pdns-net
             ipv4_address: '{{ pdns_master_ip }}'
         etc_hosts:
-          ns1.example.com: '{{ pdns_master_ip }}'
-          ns2.example.com: '{{ pdns_slave_ip }}'
+          enneesseuno.ethiclab.it: '{{ pdns_master_ip }}'
+          enneessedue.ethiclab.it: '{{ pdns_slave_ip }}'
         volumes:
           - /etc/localtime:/etc/localtime:ro
+        published_ports:
+          - '53:53'
+          - '53:53/udp'
+          - '8081:8081'
         env:
           PDNS_gmysql_password: 'my-secret-pw'
           PDNS_master: 'yes'
+          PDNS_dnsupdate: 'yes'
+          PDNS_allow-dnsupdate-from: '172.5.0.0/16 79.7.127.166/32'
           PDNS_api: 'yes'
           PDNS_api_key: 'secret'
           PDNS_webserver: 'yes'
@@ -147,8 +153,8 @@
           PDNS_version_string: 'anonymous'
           PDNS_default_ttl: '1500'
           PDNS_soa_minimum_ttl: '1200'
-          PDNS_default_soa_name: 'ns1.example.com'
-          PDNS_default_soa_mail: 'hostmaster.example.com'
+          PDNS_default_soa_name: 'enneesseuno.ethiclab.it'
+          PDNS_default_soa_mail: 'hostmaster.ethiclab.it'
           PDNS_allow_axfr_ips: '{{ pdns_slave_ip }}'
           PDNS_only_notify: '{{ pdns_slave_ip }}'
       tags:
@@ -159,14 +165,14 @@
         name: pdns-slave
         image: pschiffe/pdns-mysql:{{ "alpine" if alpine | bool else "latest" }}
         state: '{{ c_state }}'
-        hostname: ns2.example.com
+        hostname: enneessedue.ethiclab.it
         networks_cli_compatible: true
         networks:
           - name: pdns-net
             ipv4_address: '{{ pdns_slave_ip }}'
         etc_hosts:
-          ns1.example.com: '{{ pdns_master_ip }}'
-          ns2.example.com: '{{ pdns_slave_ip }}'
+          enneesseuno.ethiclab.it: '{{ pdns_master_ip }}'
+          enneessedue.ethiclab.it: '{{ pdns_slave_ip }}'
         volumes:
           - /etc/localtime:/etc/localtime:ro
         env:
