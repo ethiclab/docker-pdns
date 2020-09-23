@@ -10,7 +10,25 @@ export LC_ALL=C
 pip install --upgrade docker-py
 root@ethicserver3:~/docker-pdns# ansible-playbook ansible-playbook.yml
 ```
+# TSIG-ALLOW-DNSUPDATE
 
+This setting allows you to set the TSIG key required to do an DNS update. If you have GSS-TSIG enabled, you can use Kerberos principals here. An example, using pdnsutil to create the key:
+
+$ pdnsutil generate-tsig-key test hmac-md5
+Create new TSIG key test hmac-md5 xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+To enable TSIG Update funcion run this insert:
+
+```
+INSERT INTO `domainmetadata` (`id`, `domain_id`, `kind`, `content`) VALUES
+(2, 1, 'SOA-EDIT-API', 'DEFAULT'),
+(3, 1, 'TSIG-ALLOW-DNSUPDATE', 'test'),
+(4, 1, 'ALLOW-DNS-UPDATE-FROM', 'xx.xx.xx.xx/32'),
+(5, 1, 'SOA-EDIT-DNSUPDATE', 'INCREASE');
+```
+all updates received from xx.xx.xx.xx will be enabled
+
+Now you can use TSIG key and hmac-md5 password to test with nsupdate.sh script
 
 
 # PowerDNS Docker Images
